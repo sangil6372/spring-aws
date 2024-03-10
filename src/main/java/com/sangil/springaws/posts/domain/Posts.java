@@ -9,11 +9,14 @@ import lombok.Builder;
 import lombok.Getter;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 @Getter
 @NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
+@Table(name = "posts")
 public class Posts extends BaseTimeEntity {
 
     @Id // table의 PK필드
