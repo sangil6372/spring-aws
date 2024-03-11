@@ -13,4 +13,18 @@ server:
     encoding:
       force: true
 
+spring:
+  profiles:
+    include:
+      - dev
+      - oauth
+
+  jpa:
+    defer-datasource-initialization: false
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
 
