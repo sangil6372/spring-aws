@@ -1,5 +1,7 @@
 springdoc:
-  packages-to-scan: com.sangil.springaws.posts.controller
+  packages-to-scan:
+    - com.sangil.springaws.posts.controller
+    - com.sangil.springaws.authentication.oauth.controller
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:

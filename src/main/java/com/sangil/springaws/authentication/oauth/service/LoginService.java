@@ -2,6 +2,11 @@ package com.sangil.springaws.authentication.oauth.service;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.sangil.springaws.authentication.jwt.AuthTokensGenerator;
+import com.sangil.springaws.authentication.jwt.dto.AuthTokens;
+import com.sangil.springaws.user.domain.Role;
+import com.sangil.springaws.user.domain.User;
+import com.sangil.springaws.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
@@ -15,24 +20,32 @@ import org.springframework.web.client.RestTemplate;
 public class LoginService {
     private final Environment env;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final UserRepository userRepository;
+    private final AuthTokensGenerator authTokensGenerator;
 
-
-    public void socialLogin(String registrationId, String code){
-        System.out.println("registrationId = " + registrationId);
-        System.out.println("code = " + code);
-
+    public AuthTokens socialLogin(String registrationId, String code){
+//      registrationId (Google 정보) + code (Authorization Code)로 AccessToken을 얻어서
+//      AccessToken으로 사용자 정보 가져오는 것까지 구현 완
         String accessToken = getAccessToken(registrationId, code);
-        System.out.println("accessToken = " + accessToken);
-
         JsonNode userResourceNode = getUserResource(registrationId, accessToken);
-        System.out.println("userResourceNode = " + userResourceNode);
 
-        String id = userResourceNode.get("id").asText();
+//      DB에 사용자가 등록되었는지 여부 -> 등록x -> User 테이블에 계정 생성
+        String name = userResourceNode.get("name").asText();
         String email = userResourceNode.get("email").asText();
-        String nickname = userResourceNode.get("name").asText();
-        System.out.println("id = " + id);
-        System.out.println("email = " + email);
-        System.out.println("nickname = " + nickname);
+        String picture = userResourceNode.get("picture").asText();
+        User user = userRepository.findByEmail(email)
+                .orElseGet(()->{
+                    User newUser = User.builder()
+                            .name(name)
+                            .email(email)
+                            .picture(picture)
+                            .role(Role.USER) // 일반 사용자
+                            .build();
+                    return userRepository.save(newUser);
+                });
+
+//      사용자 정보로 jwt 토큰 발행 ( + refreshToken )
+        return authTokensGenerator.generate(user.getId());
     }
 
     private String getAccessToken(String registrationId, String authorizationCode) {
