@@ -3,5 +3,5 @@
 [CI/CD] github-action, AWS, Docker, Nginx<br>
 [Database] AWS RDS (MySQL)<Br>
 [OpenAPI]<br>
-[Back-End] Spring<br>
+[Back-End] Springboot <br>
 [Front-End] ?
